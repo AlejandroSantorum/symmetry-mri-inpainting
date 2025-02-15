@@ -1,0 +1,3 @@
+- [ ] Reference guided-diffusion project.
+- [ ] Add pre-processing code.
+- [ ] Add bash scripts.
