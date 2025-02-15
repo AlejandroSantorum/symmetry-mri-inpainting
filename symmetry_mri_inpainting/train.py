@@ -2,8 +2,17 @@ import argparse
 import logging
 
 import torch
+from torch.utils.data.distributed import DistributedSampler
 
+from symmetry_mri_inpainting.dataloading import BrainDataset
+from symmetry_mri_inpainting.model.trainer import TrainLoop
+from symmetry_mri_inpainting.utils import logger
 from symmetry_mri_inpainting.utils.arguments import create_train_argparser
+from symmetry_mri_inpainting.utils.create import (
+    create_gaussian_diffusion,
+    create_named_schedule_sampler,
+    create_unet_model,
+)
 from symmetry_mri_inpainting.utils.reproducibility import set_seed
 
 
@@ -16,7 +25,85 @@ def train(
     """
     Train the model with the given arguments.
     """
-    pass
+    # configuring output for logging and for checkpoint storing
+    if args.output_dir is not None:
+        logger.configure(dir=args.output_dir)
+    else:
+        logger.configure()
+
+    if use_gpu:
+        device = torch.device(f"cuda:{rank}")
+        torch.cuda.set_device(device)
+    else:
+        device = torch.device(f"cpu:{rank}")
+
+    logger.log(f"Initializing model and diffusion using device {device} ...")
+
+    diffusion = create_gaussian_diffusion(args=args)
+    model = create_unet_model(args=args)
+    model.to(device)
+
+    schedule_sampler = create_named_schedule_sampler(
+        args.schedule_sampler, diffusion, maxt=1000
+    )
+
+    if args.input_img_types is not None:
+        input_img_types = args.input_img_types.split(",")
+        logger.log("Using input image types: " + str(input_img_types))
+    else:
+        input_img_types = None
+
+    if args.output_img_types is not None:
+        output_img_types = args.output_img_types.split(",")
+        logger.log("Using output image types: " + str(output_img_types))
+    else:
+        output_img_types = None
+
+        logger.log(f"Creating brain dataset loading from '{args.data_dir}'")
+    brain_dataset = BrainDataset(
+        directory=args.data_dir,
+        test_flag=False,  # training
+        input_img_types=input_img_types,
+        output_img_types=output_img_types,
+        reference_img_type=args.reference_img_type,
+        num_cutoff_samples=args.num_cutoff_samples,
+        num_max_samples=args.num_max_samples,
+        seed=args.dataset_seed,
+    )
+
+    # Create a distributed sampler
+    sampler = DistributedSampler(brain_dataset, num_replicas=world_size, rank=rank)
+
+    dataloader = torch.utils.data.DataLoader(
+        brain_dataset, batch_size=args.batch_size, sampler=sampler
+    )
+
+    if args.training_seed is not None:
+        set_seed(int(args.training_seed))
+
+    logger.log("Initiating training ...")
+
+    TrainLoop(
+        model=model,
+        diffusion=diffusion,
+        classifier=None,
+        data=dataloader,  # not used
+        dataloader=dataloader,
+        batch_size=args.batch_size,
+        microbatch=args.microbatch,
+        lr=args.lr,
+        ema_rate=args.ema_rate,
+        log_interval=args.log_interval,
+        save_interval=args.save_interval,
+        resume_checkpoint=args.resume_checkpoint,
+        use_fp16=args.use_fp16,
+        fp16_scale_growth=args.fp16_scale_growth,
+        schedule_sampler=schedule_sampler,
+        weight_decay=args.weight_decay,
+        lr_anneal_steps=args.lr_anneal_steps,
+    ).run_loop()
+
+    logger.log("Training finished.")
 
 
 def main(args: argparse.Namespace) -> None:
