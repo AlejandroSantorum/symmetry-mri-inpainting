@@ -91,12 +91,14 @@ class ModelVarType(enum.Enum):
 
 
 class LossType(enum.Enum):
-    MSE = enum.auto()  # use raw MSE loss (and KL when learning variances)
-    RESCALED_MSE = (
-        enum.auto()
-    )  # use raw MSE loss (with RESCALED_KL when learning variances)
-    KL = enum.auto()  # use the variational lower-bound
-    RESCALED_KL = enum.auto()  # like KL, but rescale to estimate the full VLB
+    # use raw MSE loss (and KL when learning variances)
+    MSE = enum.auto()
+    # use raw MSE loss (with RESCALED_KL when learning variances)
+    RESCALED_MSE = enum.auto()
+    # use the variational lower-bound
+    KL = enum.auto()
+    # like KL, but rescale to estimate the full VLB
+    RESCALED_KL = enum.auto()
 
     def is_vb(self):
         return self == LossType.KL or self == LossType.RESCALED_KL
@@ -482,8 +484,6 @@ class GaussianDiffusion:
         model_kwargs=None,
         device=None,
         progress=False,
-        conditioner=None,
-        classifier=None,
     ):
         """
         A. Santorum here: I interpret that `img` is the tensor formed by concatenating
@@ -525,8 +525,6 @@ class GaussianDiffusion:
         noise=None,
         clip_denoised=True,
         denoised_fn=None,
-        cond_fn=None,
-        org=None,
         model_kwargs=None,
         device=None,
         progress=False,
@@ -896,7 +894,7 @@ class GaussianDiffusion:
         return {"output": output, "pred_xstart": out["pred_xstart"]}
 
     def training_losses_segmentation(
-        self, model, classifier, x_start, t, model_kwargs=None, noise=None
+        self, model, x_start, t, model_kwargs=None, noise=None
     ):
         """
         Compute training losses for a single timestep.
@@ -916,12 +914,13 @@ class GaussianDiffusion:
 
         goal = x_start[:, -1:, ...]
 
-        # during q, noise is only added to the ground truth!
+        # during q, noise is only added to the groundtruth
         res_t = self.q_sample(x_start=goal, t=t, noise=noise)
 
         x_t = x_start.float()
 
-        x_t[:, -1:, ...] = res_t.float()  # replace last channel by noisy GT
+        # replace last channel by noisy GT
+        x_t[:, -1:, ...] = res_t.float()
 
         terms = {}
 

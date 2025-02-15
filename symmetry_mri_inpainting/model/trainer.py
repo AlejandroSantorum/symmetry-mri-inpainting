@@ -1,7 +1,6 @@
 import copy
 import datetime as dt
 import functools
-import os
 import random
 
 import blobfile as bf
@@ -33,7 +32,6 @@ class TrainLoop:
         self,
         *,
         model,
-        classifier,
         diffusion,
         data,
         dataloader,
@@ -52,7 +50,6 @@ class TrainLoop:
     ):
         self.model = model
         self.dataloader = dataloader
-        self.classifier = classifier
         self.diffusion = diffusion
         self.data = data
         self.batch_size = batch_size
@@ -165,7 +162,6 @@ class TrainLoop:
             self.opt.load_state_dict(state_dict)
 
     def run_loop(self):
-        i = 0
         data_iter = iter(self.dataloader)
         while (
             not self.lr_anneal_steps
@@ -208,8 +204,6 @@ class TrainLoop:
 
             self.run_step(batch_stack, cond_stack)
 
-            i += 1
-
             if self.step % self.log_interval == 0:
                 _utcnow = dt.datetime.now(dt.timezone.utc)
                 logger.log(
@@ -218,9 +212,6 @@ class TrainLoop:
                 logger.dumpkvs()
             if self.step % self.save_interval == 0:
                 self.save()
-                # Run for a finite amount of time in integration tests.
-                if os.environ.get("DIFFUSION_TRAINING_TEST", "") and self.step > 0:
-                    return
             self.step += 1
         # Save the last checkpoint if it wasn't already saved.
         if (self.step - 1) % self.save_interval != 0:
@@ -249,7 +240,6 @@ class TrainLoop:
             compute_losses = functools.partial(
                 self.diffusion.training_losses_segmentation,
                 model=self.ddp_model,
-                classifier=self.classifier,
                 x_start=micro,
                 t=t,
             )
