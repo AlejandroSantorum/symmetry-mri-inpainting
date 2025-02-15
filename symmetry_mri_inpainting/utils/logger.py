@@ -3,13 +3,13 @@ Logger copied from OpenAI baselines to avoid extra RL-based dependencies:
 https://github.com/openai/baselines/blob/ea25b9e8b234e6ee1bca43083f8f3cf974143998/baselines/logger.py
 """
 
-import os
-import sys
-import os.path as osp
-import json
-import time
 import datetime
+import json
+import os
+import os.path as osp
+import sys
 import tempfile
+import time
 import warnings
 from collections import defaultdict
 from contextlib import contextmanager
@@ -47,11 +47,11 @@ class HumanOutputFormat(KVWriter, SeqWriter):
     def writekvs(self, kvs):
         # Create strings for printing
         key2str = {}
-        for key, val in sorted(kvs.items()):
-            if hasattr(val, "__float__"):
-                valstr = "%-8.3g" % val
+        for key, value in sorted(kvs.items()):
+            if hasattr(value, "__float__"):
+                valstr = "%-8.3g" % value
             else:
-                valstr = str(val)
+                valstr = str(value)
             key2str[self._truncate(key)] = self._truncate(valstr)
 
         # Find max widths
@@ -65,10 +65,15 @@ class HumanOutputFormat(KVWriter, SeqWriter):
         # Write out the data
         dashes = "-" * (keywidth + valwidth + 7)
         lines = [dashes]
-        for key, val in sorted(key2str.items(), key=lambda kv: kv[0].lower()):
+        for key, value in sorted(key2str.items(), key=lambda kv: kv[0].lower()):
             lines.append(
                 "| %s%s | %s%s |"
-                % (key, " " * (keywidth - len(key)), val, " " * (valwidth - len(val)))
+                % (
+                    key,
+                    " " * (keywidth - len(key)),
+                    value,
+                    " " * (valwidth - len(value)),
+                )
             )
         lines.append(dashes)
         self.file.write("\n".join(lines) + "\n")
@@ -146,18 +151,18 @@ class CSVOutputFormat(KVWriter):
         self.file.close()
 
 
-def make_output_format(format, ev_dir, log_suffix=""):
+def make_output_format(output_format, ev_dir, log_suffix=""):
     os.makedirs(ev_dir, exist_ok=True)
-    if format == "stdout":
+    if output_format == "stdout":
         return HumanOutputFormat(sys.stdout)
-    elif format == "log":
+    elif output_format == "log":
         return HumanOutputFormat(osp.join(ev_dir, "log%s.txt" % log_suffix))
-    elif format == "json":
+    elif output_format == "json":
         return JSONOutputFormat(osp.join(ev_dir, "progress%s.json" % log_suffix))
-    elif format == "csv":
+    elif output_format == "csv":
         return CSVOutputFormat(osp.join(ev_dir, "progress%s.csv" % log_suffix))
     else:
-        raise ValueError("Unknown format specified: %s" % (format,))
+        raise ValueError("Unknown format specified: %s" % (output_format,))
 
 
 # ================================================================
@@ -165,20 +170,20 @@ def make_output_format(format, ev_dir, log_suffix=""):
 # ================================================================
 
 
-def logkv(key, val):
+def logkv(key, value):
     """
     Log a value of some diagnostic
     Call this once for each diagnostic quantity, each iteration
     If called many times, last value will be used.
     """
-    get_current().logkv(key, val)
+    get_current().logkv(key, value)
 
 
-def logkv_mean(key, val):
+def logkv_mean(key, value):
     """
     The same as logkv(), but if called many times, values averaged.
     """
-    get_current().logkv_mean(key, val)
+    get_current().logkv_mean(key, value)
 
 
 def logkvs(d):
@@ -290,22 +295,22 @@ class Logger(object):
     # So that you can still log to the terminal without setting up any output files
     CURRENT = None  # Current logger being used by the free functions above
 
-    def __init__(self, dir, output_formats, comm=None):
+    def __init__(self, logger_dir, output_formats, comm=None):
         self.name2val = defaultdict(float)  # values this iteration
         self.name2cnt = defaultdict(int)
         self.level = INFO
-        self.dir = dir
+        self.dir = logger_dir
         self.output_formats = output_formats
         self.comm = comm
 
     # Logging API, forwarded
     # ----------------------------------------
-    def logkv(self, key, val):
-        self.name2val[key] = val
+    def logkv(self, key, value):
+        self.name2val[key] = value
 
-    def logkv_mean(self, key, val):
+    def logkv_mean(self, key, value):
         oldval, cnt = self.name2val[key], self.name2cnt[key]
-        self.name2val[key] = oldval * cnt / (cnt + 1) + val / (cnt + 1)
+        self.name2val[key] = oldval * cnt / (cnt + 1) + value / (cnt + 1)
         self.name2cnt[key] = cnt + 1
 
     def dumpkvs(self):
@@ -377,40 +382,38 @@ def mpi_weighted_mean(comm, local_name2valcount):
         name2sum = defaultdict(float)
         name2count = defaultdict(float)
         for n2vc in all_name2valcount:
-            for name, (val, count) in n2vc.items():
+            for name, (value, count) in n2vc.items():
                 try:
-                    val = float(val)
+                    value = float(value)
                 except ValueError:
                     if comm.rank == 0:
                         warnings.warn(
                             "WARNING: tried to compute mean on non-float {}={}".format(
-                                name, val
+                                name, value
                             )
                         )
                 else:
-                    name2sum[name] += val * count
+                    name2sum[name] += value * count
                     name2count[name] += count
         return {name: name2sum[name] / name2count[name] for name in name2sum}
     else:
         return {}
 
 
-def configure(
-    dir="./results", format_strs=None, comm=None, log_suffix=""
-):
+def configure(logger_dir="./results", format_strs=None, comm=None, log_suffix=""):
     """
     If comm is provided, average all numerical stats across that comm
     """
-    if dir is None:
-        dir = os.getenv("OPENAI_LOGDIR")
-    if dir is None:
-        dir = osp.join(
+    if logger_dir is None:
+        logger_dir = os.getenv("OPENAI_LOGDIR")
+    if logger_dir is None:
+        logger_dir = osp.join(
             tempfile.gettempdir(),
             datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f"),
         )
-    assert isinstance(dir, str)
-    dir = os.path.expanduser(dir)
-    os.makedirs(os.path.expanduser(dir), exist_ok=True)
+    assert isinstance(logger_dir, str)
+    logger_dir = os.path.expanduser(logger_dir)
+    os.makedirs(os.path.expanduser(logger_dir), exist_ok=True)
 
     rank = get_rank_without_mpi_import()
     if rank > 0:
@@ -422,11 +425,15 @@ def configure(
         else:
             format_strs = os.getenv("OPENAI_LOG_FORMAT_MPI", "log").split(",")
     format_strs = filter(None, format_strs)
-    output_formats = [make_output_format(f, dir, log_suffix) for f in format_strs]
+    output_formats = [
+        make_output_format(f, logger_dir, log_suffix) for f in format_strs
+    ]
 
-    Logger.CURRENT = Logger(dir=dir, output_formats=output_formats, comm=comm)
+    Logger.CURRENT = Logger(
+        logger_dir=logger_dir, output_formats=output_formats, comm=comm
+    )
     if output_formats:
-        log("Logging to %s" % dir)
+        log("Logging to %s" % logger_dir)
 
 
 def _configure_default_logger():
@@ -442,9 +449,9 @@ def reset():
 
 
 @contextmanager
-def scoped_configure(dir=None, format_strs=None, comm=None):
+def scoped_configure(logger_dir=None, format_strs=None, comm=None):
     prevlogger = Logger.CURRENT
-    configure(dir=dir, format_strs=format_strs, comm=comm)
+    configure(logger_dir=logger_dir, format_strs=format_strs, comm=comm)
     try:
         yield
     finally:

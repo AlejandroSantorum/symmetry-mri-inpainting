@@ -20,20 +20,20 @@ def get_train_defaults() -> Dict:
             - use_fp16 (bool): Whether to use 16-bit floating point precision (default: False).
             - fp16_scale_growth (float): The growth factor for dynamic loss scaling in FP16 training (default: 1e-3).
     """
-    return dict(
-        schedule_sampler="uniform",
-        lr=1e-4,
-        weight_decay=0.0,
-        lr_anneal_steps=0,
-        batch_size=1,
-        microbatch=-1,
-        ema_rate="0.9999",
-        log_interval=1000,
-        save_interval=10000,
-        resume_checkpoint="",
-        use_fp16=False,
-        fp16_scale_growth=1e-3,
-    )
+    return {
+        "schedule_sampler": "uniform",
+        "lr": 1e-4,
+        "weight_decay": 0.0,
+        "lr_anneal_steps": 0,
+        "batch_size": 1,
+        "microbatch": -1,
+        "ema_rate": "0.9999",
+        "log_interval": 1000,
+        "save_interval": 10000,
+        "resume_checkpoint": "",
+        "use_fp16": False,
+        "fp16_scale_growth": 1e-3,
+    }
 
 
 def get_model_and_diffusion_defaults() -> Dict:
@@ -69,25 +69,25 @@ def get_model_defaults() -> Dict:
             - use_fp16 (bool): Whether to use 16-bit floating point precision (default: False).
             - use_new_attention_order (bool): Whether to use a new attention order (default: False).
     """
-    return dict(
-        image_size=64,
-        num_model_channels=128,
-        num_in_channels=3,
-        num_out_channels=2,
-        num_res_blocks=2,
-        num_heads=4,
-        num_heads_upsample=-1,
-        num_head_channels=-1,
-        attention_resolutions="16,8",
-        channel_mult="",
-        dropout=0.0,
-        class_cond=False,
-        use_checkpoint=False,
-        use_scale_shift_norm=True,
-        resblock_updown=False,
-        use_fp16=False,
-        use_new_attention_order=False,
-    )
+    return {
+        "image_size": 64,
+        "num_model_channels": 128,
+        "num_in_channels": 3,
+        "num_out_channels": 2,
+        "num_res_blocks": 2,
+        "num_heads": 4,
+        "num_heads_upsample": -1,
+        "num_head_channels": -1,
+        "attention_resolutions": "16,8",
+        "channel_mult": "",
+        "dropout": 0.0,
+        "class_cond": False,
+        "use_checkpoint": False,
+        "use_scale_shift_norm": True,
+        "resblock_updown": False,
+        "use_fp16": False,
+        "use_new_attention_order": False,
+    }
 
 
 def get_diffusion_defaults() -> Dict:
@@ -105,13 +105,13 @@ def get_diffusion_defaults() -> Dict:
             - rescale_timesteps (bool): Whether to rescale timesteps (default: False).
             - rescale_learned_sigmas (bool): Whether to rescale learned sigmas (default: False).
     """
-    return dict(
-        learn_sigma=False,
-        diffusion_steps=1000,
-        noise_schedule="linear",
-        timestep_respacing="",
-        use_kl=False,
-        predict_xstart=False,
-        rescale_timesteps=False,
-        rescale_learned_sigmas=False,
-    )
+    return {
+        "learn_sigma": False,
+        "diffusion_steps": 1000,
+        "noise_schedule": "linear",
+        "timestep_respacing": "",
+        "use_kl": False,
+        "predict_xstart": False,
+        "rescale_timesteps": False,
+        "rescale_learned_sigmas": False,
+    }

@@ -1,10 +1,15 @@
 import argparse
-from typing import Union, Dict
+from typing import Dict, Union
 
-from symmetry_mri_inpainting.model.defaults import get_train_defaults, get_model_and_diffusion_defaults
+from symmetry_mri_inpainting.model.defaults import (
+    get_model_and_diffusion_defaults,
+    get_train_defaults,
+)
 
 
-def create_train_argparser(parser: argparse.ArgumentParser = None) -> argparse.ArgumentParser:
+def create_train_argparser(
+    parser: argparse.ArgumentParser = None,
+) -> argparse.ArgumentParser:
     if parser is None:
         parser = argparse.ArgumentParser(
             description="Train a symmetry-aware denoising diffusion model on MRI images for inpainting."
@@ -12,7 +17,6 @@ def create_train_argparser(parser: argparse.ArgumentParser = None) -> argparse.A
     add_dict_to_argparser(parser, get_train_defaults())
     add_dict_to_argparser(parser, get_model_and_diffusion_defaults())
     return parser
-
 
 
 def add_dict_to_argparser(parser: argparse.ArgumentParser, default_dict: Dict):
@@ -25,7 +29,7 @@ def add_dict_to_argparser(parser: argparse.ArgumentParser, default_dict: Dict):
         parser.add_argument(f"--{k}", default=v, type=v_type)
 
 
-def str2bool(value: Union[str,bool]) -> bool:
+def str2bool(value: Union[str, bool]) -> bool:
     """
     https://stackoverflow.com/questions/15008758/parsing-boolean-values-with-argparse
     """
@@ -36,4 +40,6 @@ def str2bool(value: Union[str,bool]) -> bool:
     elif value.lower() in ("no", "false", "f", "n", "0"):
         return False
     else:
-        raise argparse.ArgumentTypeError(f"A boolean value expected, but '{value}' was given.")
+        raise argparse.ArgumentTypeError(
+            f"A boolean value expected, but '{value}' was given."
+        )
