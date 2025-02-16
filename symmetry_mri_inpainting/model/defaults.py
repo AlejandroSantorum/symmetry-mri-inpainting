@@ -66,7 +66,6 @@ def get_model_defaults() -> Dict:
             - use_checkpoint (bool): Whether to use gradient checkpointing (default: False).
             - use_scale_shift_norm (bool): Whether to use scale-shift normalization (default: True).
             - resblock_updown (bool): Whether to use residual blocks for up/downsampling (default: False).
-            - use_fp16 (bool): Whether to use 16-bit floating point precision (default: False).
             - use_new_attention_order (bool): Whether to use a new attention order (default: False).
     """
     return {
@@ -85,7 +84,6 @@ def get_model_defaults() -> Dict:
         "use_checkpoint": False,
         "use_scale_shift_norm": True,
         "resblock_updown": False,
-        "use_fp16": False,
         "use_new_attention_order": False,
     }
 

@@ -1,3 +1,4 @@
+import copy
 from typing import Dict
 
 from symmetry_mri_inpainting.model import gaussian_diffusion as gd
@@ -28,7 +29,12 @@ def create_unet_model(args: Dict) -> UNetModel:
     Create a U-Net model for inpainting.
     """
     model_defaults = get_model_defaults()
-    model_args = {**model_defaults, **args}
+
+    model_args = copy.deepcopy(model_defaults)
+    for arg in model_defaults:
+        if arg in args:
+            model_args[arg] = args[arg]
+
     return _create_unet_model(**model_args)
 
 
@@ -37,7 +43,12 @@ def create_gaussian_diffusion(args: Dict) -> SpacedDiffusion:
     Create a Gaussian diffusion model for inpainting.
     """
     diffusion_defaults = get_diffusion_defaults()
-    diffusion_args = {**diffusion_defaults, **args}
+
+    diffusion_args = copy.deepcopy(diffusion_defaults)
+    for arg in diffusion_defaults:
+        if arg in args:
+            diffusion_args[arg] = args[arg]
+
     return _create_gaussian_diffusion(**diffusion_args)
 
 
@@ -101,7 +112,7 @@ def _create_unet_model(
 
 def _create_gaussian_diffusion(
     *,
-    steps=1000,
+    diffusion_steps=1000,
     learn_sigma=False,
     sigma_small=False,
     noise_schedule="linear",
@@ -111,7 +122,7 @@ def _create_gaussian_diffusion(
     rescale_learned_sigmas=False,
     timestep_respacing="",
 ):
-    betas = gd.get_named_beta_schedule(noise_schedule, steps)
+    betas = gd.get_named_beta_schedule(noise_schedule, diffusion_steps)
     if use_kl:
         loss_type = gd.LossType.RESCALED_KL
     elif rescale_learned_sigmas:
@@ -119,9 +130,9 @@ def _create_gaussian_diffusion(
     else:
         loss_type = gd.LossType.MSE
     if not timestep_respacing:
-        timestep_respacing = [steps]
+        timestep_respacing = [diffusion_steps]
     return SpacedDiffusion(
-        use_timesteps=space_timesteps(steps, timestep_respacing),
+        use_timesteps=space_timesteps(diffusion_steps, timestep_respacing),
         betas=betas,
         model_mean_type=(
             gd.ModelMeanType.EPSILON if not predict_xstart else gd.ModelMeanType.START_X

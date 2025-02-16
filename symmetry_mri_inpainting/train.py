@@ -4,7 +4,7 @@ import logging
 import torch
 from torch.utils.data.distributed import DistributedSampler
 
-from symmetry_mri_inpainting.dataloading import BrainDataset
+from symmetry_mri_inpainting.dataloading.brain_dataset import BrainDataset
 from symmetry_mri_inpainting.model.trainer import TrainLoop
 from symmetry_mri_inpainting.utils import logger
 from symmetry_mri_inpainting.utils.arguments import create_train_argparser
@@ -27,7 +27,7 @@ def train(
     """
     # configuring output for logging and for checkpoint storing
     if args.output_dir is not None:
-        logger.configure(dir=args.output_dir)
+        logger.configure(logger_dir=args.output_dir)
     else:
         logger.configure()
 
@@ -39,8 +39,8 @@ def train(
 
     logger.log(f"Initializing model and diffusion using device {device} ...")
 
-    diffusion = create_gaussian_diffusion(args=args)
-    model = create_unet_model(args=args)
+    diffusion = create_gaussian_diffusion(args=vars(args))
+    model = create_unet_model(args=vars(args))
     model.to(device)
 
     schedule_sampler = create_named_schedule_sampler(
@@ -78,15 +78,16 @@ def train(
         brain_dataset, batch_size=args.batch_size, sampler=sampler
     )
 
+    seed_info = ""
     if args.training_seed is not None:
         set_seed(int(args.training_seed))
+        seed_info = f" with seed {args.training_seed} "
 
-    logger.log("Initiating training ...")
+    logger.log(f"Initiating training {seed_info}...")
 
     TrainLoop(
         model=model,
         diffusion=diffusion,
-        classifier=None,
         data=dataloader,  # not used
         dataloader=dataloader,
         batch_size=args.batch_size,
