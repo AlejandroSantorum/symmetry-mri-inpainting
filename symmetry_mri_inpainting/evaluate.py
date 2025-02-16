@@ -343,7 +343,7 @@ def main(args: argparse.Namespace) -> None:
     gpu_count = torch.cuda.device_count()
     logging.info(f"Number of CUDA GPU available devices: {gpu_count}")
 
-    if gpu_count > 1:
+    if gpu_count > 0:
         logging.info(
             f"IDs of CUDA available devices: {os.getenv('CUDA_VISIBLE_DEVICES')}"
         )
