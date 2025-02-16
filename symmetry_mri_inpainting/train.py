@@ -1,13 +1,14 @@
 import argparse
 import logging
+import os
 
 import torch
 from torch.utils.data.distributed import DistributedSampler
 
 from symmetry_mri_inpainting.dataloading.brain_dataset import BrainDataset
 from symmetry_mri_inpainting.model.trainer import TrainLoop
-from symmetry_mri_inpainting.utils import logger
-from symmetry_mri_inpainting.utils.arguments import create_train_argparser
+from symmetry_mri_inpainting.utils import logger, dist_util
+from symmetry_mri_inpainting.utils.arguments import get_create_train_argparser
 from symmetry_mri_inpainting.utils.create import (
     create_gaussian_diffusion,
     create_named_schedule_sampler,
@@ -30,6 +31,8 @@ def train(
         logger.configure(logger_dir=args.output_dir)
     else:
         logger.configure()
+
+    dist_util.setup_dist(rank, world_size)
 
     if use_gpu:
         device = torch.device(f"cuda:{rank}")
@@ -116,6 +119,7 @@ def main(args: argparse.Namespace) -> None:
     logging.info(f"Number of CUDA GPU available devices: {gpu_count}")
 
     if gpu_count > 1:
+        logging.info(f"IDs of CUDA available devices: {os.getenv('CUDA_VISIBLE_DEVICES')}")
         torch.multiprocessing.spawn(
             train,
             args=(True, gpu_count, args),
@@ -123,6 +127,7 @@ def main(args: argparse.Namespace) -> None:
             join=True,
         )
     else:
+        logging.info("CPU training")
         train(rank=0, use_gpu=False, world_size=1, args=args)
 
 
@@ -186,6 +191,6 @@ if __name__ == "__main__":
         help="The seed to use for training the model.",
     )
 
-    parser = create_train_argparser(parser=parser)
+    parser = get_create_train_argparser(parser=parser)
     args = parser.parse_args()
     main(args=args)
