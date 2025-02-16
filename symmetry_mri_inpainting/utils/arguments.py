@@ -7,7 +7,18 @@ from symmetry_mri_inpainting.model.defaults import (
 )
 
 
-def create_train_argparser(
+def get_create_eval_argparser(
+    parser: argparse.ArgumentParser = None,
+) -> argparse.ArgumentParser:
+    if parser is None:
+        parser = argparse.ArgumentParser(
+            description="Evaluate a symmetry-aware denoising diffusion model on MRI images for inpainting."
+        )
+    add_dict_to_argparser(parser, get_model_and_diffusion_defaults())
+    return parser
+
+
+def get_create_train_argparser(
     parser: argparse.ArgumentParser = None,
 ) -> argparse.ArgumentParser:
     if parser is None:
