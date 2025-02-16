@@ -4,7 +4,10 @@ from ._mse_2d import mse_2d
 
 
 def psnr_2d(
-    test_img: np.ndarray, ref_img: np.ndarray, mask: np.ndarray = None, max_val: float = None,
+    test_img: np.ndarray,
+    ref_img: np.ndarray,
+    mask: np.ndarray = None,
+    max_val: float = None,
 ) -> float:
     """Calculate the Peak Signal to Noise Ratio between two 2D images.
 
@@ -22,7 +25,7 @@ def psnr_2d(
     -------
     psnr: float
         The Peak Signal to Noise Ratio between the two images.
-    
+
     Reference
     ---------
     - "Peak Signal-to-Noise Ratio (PSNR)". PyTorch Lightning Metrics.
@@ -38,10 +41,10 @@ def psnr_2d(
     _mse = mse_2d(test_img=test_img, ref_img=ref_img, mask=mask)
 
     if mask is not None:
-        mask = (mask > 0.0)
+        mask = mask > 0.0
         ref_img = ref_img[mask]
         test_img = test_img[mask]
-    
+
     if max_val is None:
         max_val = ref_img.max()
 

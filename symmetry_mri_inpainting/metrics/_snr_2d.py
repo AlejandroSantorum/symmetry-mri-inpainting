@@ -27,7 +27,7 @@ def snr_2d(ref_img: np.ndarray, test_img: np.ndarray, mask: np.ndarray = None) -
     assert ref_img.shape == test_img.shape
 
     if mask is not None:
-        mask = (mask > 0.0)
+        mask = mask > 0.0
         ref_img = ref_img[mask]
         test_img = test_img[mask]
 

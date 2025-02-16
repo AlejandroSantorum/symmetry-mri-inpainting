@@ -7,7 +7,7 @@ from torch.utils.data.distributed import DistributedSampler
 
 from symmetry_mri_inpainting.dataloading.brain_dataset import BrainDataset
 from symmetry_mri_inpainting.model.trainer import TrainLoop
-from symmetry_mri_inpainting.utils import logger, dist_util
+from symmetry_mri_inpainting.utils import dist_util, logger
 from symmetry_mri_inpainting.utils.arguments import get_create_train_argparser
 from symmetry_mri_inpainting.utils.create import (
     create_gaussian_diffusion,
@@ -119,7 +119,9 @@ def main(args: argparse.Namespace) -> None:
     logging.info(f"Number of CUDA GPU available devices: {gpu_count}")
 
     if gpu_count > 1:
-        logging.info(f"IDs of CUDA available devices: {os.getenv('CUDA_VISIBLE_DEVICES')}")
+        logging.info(
+            f"IDs of CUDA available devices: {os.getenv('CUDA_VISIBLE_DEVICES')}"
+        )
         torch.multiprocessing.spawn(
             train,
             args=(True, gpu_count, args),
