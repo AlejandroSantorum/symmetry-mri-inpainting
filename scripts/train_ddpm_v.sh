@@ -12,7 +12,8 @@ INPUT_CHANNELS=2
 TRAIN_SAMPLES=400
 MODEL_FLAGS="--image_size 256 --num_in_channels ${INPUT_CHANNELS} --num_heads 1 --learn_sigma True --use_scale_shift_norm False --attention_resolutions 16"
 TRAIN_FLAGS="--save_interval 20000"
-TRAIN_SEED=42  # other experiments used 10
+DATASET_SEED=42  # seed for the dataset split
+TRAIN_SEED=42  # seed for training - other experiments used 10
 
 PYTHONPATH="/home/santorum/repos/symmetry-mri-inpainting" \
 python3 /home/santorum/repos/symmetry-mri-inpainting/symmetry_mri_inpainting/train.py \
@@ -22,6 +23,6 @@ python3 /home/santorum/repos/symmetry-mri-inpainting/symmetry_mri_inpainting/tra
     --output_img_types "voided,brain" \
     --reference_img_type "mask" \
     --num_cutoff_samples $TRAIN_SAMPLES \
-    --dataset_seed 42 \
+    --dataset_seed $DATASET_SEED \
     --training_seed $TRAIN_SEED \
     $MODEL_FLAGS $TRAIN_FLAGS
