@@ -2,4 +2,5 @@
 - [ ] Reference guided-diffusion project.
 - [ ] Add pre-processing code.
 - [ ] Add bash scripts.
-- [ ] Remove learn_sigma input argument.
+- [x] Remove learn_sigma input argument.
+- [x] Remove use_scale_shift_norm input argument.

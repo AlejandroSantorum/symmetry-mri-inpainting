@@ -64,7 +64,7 @@ def get_model_defaults() -> Dict:
             - dropout (float): Dropout rate (default: 0.0).
             - class_cond (bool): Whether to use class conditioning (default: False).
             - use_checkpoint (bool): Whether to use gradient checkpointing (default: False).
-            - use_scale_shift_norm (bool): Whether to use scale-shift normalization (default: True).
+            - use_scale_shift_norm (bool): Whether to use scale-shift normalization (default: False).
             - resblock_updown (bool): Whether to use residual blocks for up/downsampling (default: False).
             - use_new_attention_order (bool): Whether to use a new attention order (default: False).
     """
@@ -82,7 +82,7 @@ def get_model_defaults() -> Dict:
         "dropout": 0.0,
         "class_cond": False,
         "use_checkpoint": False,
-        "use_scale_shift_norm": True,
+        "use_scale_shift_norm": False,
         "resblock_updown": False,
         "use_new_attention_order": False,
     }
@@ -94,7 +94,7 @@ def get_diffusion_defaults() -> Dict:
 
     Returns:
         dict: A dictionary containing default values for diffusion training parameters.
-            - learn_sigma (bool): Whether to learn the noise standard deviation (default: False).
+            - learn_sigma (bool): Whether to learn the noise standard deviation (default: True).
             - diffusion_steps (int): The number of diffusion steps (default: 1000).
             - noise_schedule (str): The noise schedule type (default: "linear").
             - timestep_respacing (str): The respacing of timesteps (default: "", use default spacing).
@@ -104,7 +104,7 @@ def get_diffusion_defaults() -> Dict:
             - rescale_learned_sigmas (bool): Whether to rescale learned sigmas (default: False).
     """
     return {
-        "learn_sigma": False,
+        "learn_sigma": True,
         "diffusion_steps": 1000,
         "noise_schedule": "linear",
         "timestep_respacing": "",

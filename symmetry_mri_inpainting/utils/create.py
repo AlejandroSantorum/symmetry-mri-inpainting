@@ -113,7 +113,7 @@ def _create_unet_model(
 def _create_gaussian_diffusion(
     *,
     diffusion_steps=1000,
-    learn_sigma=False,
+    learn_sigma=True,
     sigma_small=False,
     noise_schedule="linear",
     use_kl=False,

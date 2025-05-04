@@ -16,7 +16,7 @@ REF_IMG_TYPE="mask"
 
 # Training config
 TRAIN_SAMPLES=400
-MODEL_FLAGS="--image_size 256 --num_in_channels ${INPUT_CHANNELS} --num_heads 1 --learn_sigma True --use_scale_shift_norm False --attention_resolutions 16"
+MODEL_FLAGS="--image_size 256 --num_in_channels ${INPUT_CHANNELS} --num_heads 1 --attention_resolutions 16"
 TRAIN_FLAGS="--save_interval 20000"
 DATASET_SEED=42  # seed for the dataset split
 TRAIN_SEED=42  # seed for training - other experiments used 10
