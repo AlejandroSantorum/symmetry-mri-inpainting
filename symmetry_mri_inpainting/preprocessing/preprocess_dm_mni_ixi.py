@@ -3,11 +3,11 @@ import os
 import sys
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from preprocess_utils import process_images  # noqa: E402
+from preprocess_utils import process_images_for_ddpms  # noqa: E402
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Script to convert BraTSC 2023 dataset to MNI space"
+        description="Script to convert IXI dataset to MNI space"
     )
 
     parser.add_argument(
@@ -15,21 +15,21 @@ if __name__ == "__main__":
         "-i",
         type=str,
         required=True,
-        help="Path to BraTSC 2023 dataset in MNI space",
-        default="/scratch/santorum/data/bratsc2023-mni",
+        help="Path to IXI dataset in MNI space",
+        default="/scratch/santorum/data/IXI-skull-stripped-mni",
     )
     parser.add_argument(
         "--dataset-output-path",
         "-o",
         type=str,
         required=True,
-        help="Path to the output BraTSC 2023 dataset in MNI space after preprocessing",
-        default="/scratch/santorum/data/brats2023-mni-dm-inpainting-preprocessed-3d",
+        help="Path to the output IXI dataset in MNI space after preprocessing",
+        default="/scratch/santorum/data/IXI-skull-stripped-mni-dm-inpainting-preprocessed-3d",
     )
 
     args = parser.parse_args()
 
-    process_images(
+    process_images_for_ddpms(
         input_folder=args.dataset_input_path,
         output_folder=args.dataset_output_path,
     )

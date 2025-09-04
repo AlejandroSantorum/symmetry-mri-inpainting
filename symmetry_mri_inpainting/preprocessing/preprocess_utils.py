@@ -88,7 +88,7 @@ def symmetrize_image(image, mask, axis=2):
     return symmetrized_image
 
 
-def process_images(input_folder, output_folder, seed=42):
+def process_images_for_ddpms(input_folder, output_folder, seed=42):
     np.random.seed(seed)
     target_shape = (224, 224, 224)
 
@@ -210,4 +210,7 @@ if __name__ == "__main__":
 
     args = argparser.parse_args()
 
-    process_images(input_folder=args.input_folder, output_folder=args.output_folder)
+    process_images_for_ddpms(
+        input_folder=args.input_folder,
+        output_folder=args.output_folder,
+    )
