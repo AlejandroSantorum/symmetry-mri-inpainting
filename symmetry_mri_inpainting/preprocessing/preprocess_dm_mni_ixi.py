@@ -7,7 +7,7 @@ from preprocess_utils import process_images_for_ddpms  # noqa: E402
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Script to convert IXI dataset to MNI space"
+        description="Script to convert IXI dataset in the MNI space to be used by the DDPMs"
     )
 
     parser.add_argument(

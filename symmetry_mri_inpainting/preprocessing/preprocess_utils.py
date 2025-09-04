@@ -1,9 +1,48 @@
 import argparse
 import os
 
+import matplotlib.pyplot as plt
 import nibabel as nib
 import numpy as np
 from scipy.ndimage import rotate
+
+
+def slice_and_convert_png(
+    input_dirpath: str,
+    subject_name: str,
+    brains_output_dirpath: str,
+    masks_output_dirpath: str,
+) -> None:
+    brain_img_name = f"{subject_name}-brain"
+    brain_img_fpath = os.path.join(
+        input_dirpath, subject_name, f"{brain_img_name}.nii.gz"
+    )
+    mask_img_name = f"{subject_name}-mask"
+    mask_img_fpath = os.path.join(
+        input_dirpath, subject_name, f"{mask_img_name}.nii.gz"
+    )
+
+    brain_img_3d = nib.load(brain_img_fpath).get_fdata(dtype=np.float32)
+    mask_img_3d = nib.load(mask_img_fpath).get_fdata(dtype=np.float32)
+
+    os.makedirs(os.path.join(brains_output_dirpath, subject_name), exist_ok=True)
+    os.makedirs(os.path.join(masks_output_dirpath, subject_name), exist_ok=True)
+
+    num_axial_slices = brain_img_3d.shape[2]
+    for slice_idx in range(num_axial_slices):
+        brain_slice = brain_img_3d[:, :, slice_idx]
+        mask_slice = mask_img_3d[:, :, slice_idx]
+        if np.sum(mask_slice) > 0.0:  # Skip empty mask slices
+            brain_slice_filename = f"{brain_img_name}-slice{slice_idx}.png"
+            brain_slice_filepath = os.path.join(
+                brains_output_dirpath, subject_name, brain_slice_filename
+            )
+            mask_slice_filename = f"{mask_img_name}-slice{slice_idx}.png"
+            mask_slice_filepath = os.path.join(
+                masks_output_dirpath, subject_name, mask_slice_filename
+            )
+            plt.imsave(brain_slice_filepath, brain_slice, cmap="gray")
+            plt.imsave(mask_slice_filepath, mask_slice, cmap="gray")
 
 
 def normalize_image(image):
