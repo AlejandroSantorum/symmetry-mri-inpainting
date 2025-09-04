@@ -16,6 +16,7 @@ The figure below shows the proposed method exploiting brain pseudo-symmetry as a
 To ensure consistency and improve the generalization of brain inpainting, intensity outliers are mitigated by clipping values beyond the 0.1 and 99.9 percentiles, and the final images are cropped and padded to obtain a standardized image size of 224 x 224 x 224.
 
 The right-hand side of figure below illustrates the training process of the proposed context-enhanced diffusion model. The input consists of three image channels: the first context channel is the voided image, which masks the region to be inpainted, while the second is the symmetrized mask, representing the tissue from the symmetrical part of the brain relative to the MSP reflected in the other side of brain. The third channel is the T1 scan, which is corrupted with Gaussian noise and then denoised by the trained U-Net.
+
 ![Symmetry-Aware DDPM](imgs/symm_ddpm_diagram.png)
 <!---
 <img src="imgs/symm_ddpm_diagram.png" width=450 height=320 alt="Symmetry-Aware DDPM">
@@ -42,12 +43,14 @@ Overall, the proposed DDPM-V+SM achieves the best performance across all evaluat
 
 ## Qualitative Results
 The following figure illustrates the reconstruction results on a dataset of healthy brain samples at different training steps for masked regions using the four considered models. The voided image (first column) and its corresponding mask (second column) serve as inputs, while the subsequent columns display reconstructions at 20K, 40K, and 100K training steps (x8 for the GAN). The final two columns show the ground-truth image and the difference between the 100K-step reconstruction and the ground- truth. The proposed model, which incorporates symmetric brain context, consistently achieves more accurate reconstructions at earlier training stages than other diffusion-based approaches. While all models eventually converge to realistic inpainting results, this method benefits from faster convergence due to its use of anatomical symmetry. By leveraging structural symmetry, the proposed approach more effectively aligns ventricle features and intensities across hemispheres, resulting in improved reconstruction accuracy.
+
 ![Inpainted Healthy Slice](imgs/healthy_inpainted_slice.png)
 <!---
 <img src="imgs/healthy_inpainted_slice.png" width=450 height=320 alt="Symmetry-Aware DDPM">
 -->
 
 The figure below presents a reconstructed brain slice affected by a tumor. Notably, DDPM-V+SM, which integrates a symmetric mask containing explicit information from the contralateral hemisphere, achieves superior reconstruction of the ventricle region compared to other models, whose results display less distinct anatomical details. These findings indicate that incorporating symmetric context enables more accurate restoration of complex brain structures. Furthermore, the proposed symmetry-aware diffusion model more precisely recovers the brain contour than the other generative approaches.
+
 ![Inpainted Diseased Slice](imgs/diseased_inpainted_slice.png)
 <!---
 <img src="imgs/diseased_inpainted_slice.png" width=450 height=320 alt="Symmetry-Aware DDPM">
