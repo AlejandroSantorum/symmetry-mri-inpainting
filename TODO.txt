@@ -1,7 +1,0 @@
-- [x] Add evaluation bash scripts.
-- [ ] Reference guided-diffusion project.
-- [x] Add pre-processing code.
-- [ ] Add bash scripts.
-- [x] Remove learn_sigma input argument.
-- [x] Remove use_scale_shift_norm input argument.
-- [x] AOT-GAN code and reference.
