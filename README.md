@@ -66,5 +66,3 @@ High-Resolution Image Inpainting. IEEE Trans. Vis. Comput. Graph. (2022).
 - Durrer, A., Wolleb, J., Cattin, P.C.: Denoising Diffusion Models for Inpainting of Healthy Brain Tissue. In: Brain Tumor Segmentation, and Cross-Modality Domain Adaptation for Medical Image Segmentation, pp. 35–45. Springer (2024).
 
 - Durrer, A., Wolleb, J., Bieder, F., Friedrich, P., Melie-Garcia, L., Pineda, M.A.O., Bercea, C.I., et al.: Denoising Diffusion Models for 3D Healthy Brain Tissue In- painting. In: Deep Generative Models. Springer (2025).
-
-
