@@ -1,11 +1,9 @@
-
+import argparse
 import os
 import sys
-import argparse
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from preprocess_utils import process_images
-
+from preprocess_utils import process_images  # noqa: E402
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -30,7 +28,7 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    
+
     process_images(
         input_folder=args.dataset_input_path,
         output_folder=args.dataset_output_path,
