@@ -1,6 +1,6 @@
 # Preprocess datasets
 
-This directory contains scripts to preprocess several datasets.
+This directory contains scripts to preprocess several datasets, following the diagram below:
 
 ![Data Preprocessing Scripts](../../imgs/data_preprocessing_scripts.png)
 <!---
