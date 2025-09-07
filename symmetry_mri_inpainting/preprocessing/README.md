@@ -2,7 +2,7 @@
 
 This directory contains scripts to preprocess several datasets.
 
-![Data Preprocessing Scripts](imgs/data_preprocessing_scripts.png)
+![Data Preprocessing Scripts](../../imgs/data_preprocessing_scripts.png)
 <!---
-<img src="imgs/data_preprocessing_scripts.png" width=450 height=320 alt="Data Preprocessing Scripts">
+<img src="../../imgs/data_preprocessing_scripts.png" width=450 height=320 alt="Data Preprocessing Scripts">
 -->
